@@ -23,6 +23,15 @@ public class playermove : MonoBehaviour
 
     [SerializeField] private Transform _headChecker;
 
+    [Header(("Animation"))]
+    [SerializeField] private Animator _animator;
+
+    [SerializeField] private string _runAnimatorKey;
+
+    [SerializeField] private string _jumpAnimatorKey;
+
+    [SerializeField] private string _crouchAnimatorKey;
+
     private float _direction;
 
     private bool _Jump;
@@ -38,8 +47,8 @@ public class playermove : MonoBehaviour
     private void Update()
     {
      _direction = Input.GetAxisRaw("Horizontal");
-            Debug.Log(_direction);
-
+            _animator.SetFloat(_runAnimatorKey, Mathf.Abs(_direction));
+         
         if (Input.GetKeyDown(KeyCode.Space) )
         {
             _Jump = true;
@@ -64,10 +73,10 @@ public class playermove : MonoBehaviour
 
         _rigidbody.velocity = new Vector2(x:_direction * _speed, _rigidbody.velocity.y);
 
-        bool canJump =(bool) Physics2D.OverlapCircle((Vector2) _groundchecker.position, _groundcheckerRadius, (int) _whatisground);
-        bool canStand = Physics2D.OverlapCircle((Vector2)_headChecker.position, _headCheckerRadius, (int) _whatisground);
+        bool canJump =(bool)Physics2D.OverlapCircle((Vector2) _groundchecker.position, _groundcheckerRadius, (int) _whatisground);
+        bool canStand = !Physics2D.OverlapCircle((Vector2)_headChecker.position, _headCheckerRadius, (int) _whatisground);
 
-        Debug.Log(message: !_crawl! && canStand);
+       
 
         _headCollider.enabled = !_crawl && canStand;
 
@@ -76,13 +85,33 @@ public class playermove : MonoBehaviour
             _rigidbody.AddForce(Vector2.up * _jumpeForce);
             _Jump = false;
         }
-   
+
+        _animator.SetBool(_jumpAnimatorKey, !canJump);
+        _animator.SetBool(_crouchAnimatorKey , ! _headCollider.enabled );
     }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere( _groundchecker.position ,  _groundcheckerRadius);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(_headChecker.position, _headCheckerRadius);
+    }
+
+
+
+
+ public void TakeWater(int Water)
+    {
+        Debug.Log($"You found water: {Water}");
+    }
+
+    public void  FindChest(int Chest)
+    {
+        Debug.Log($"You open the chest: {Chest}");
+    }
+
+    public void FindTorch(int Torch)
+    {
+        Debug.Log($"You found the torch : {Torch}");
     }
 }
 
